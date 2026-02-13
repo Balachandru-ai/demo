@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Full Stack App - Jenkins Docker Deployment</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <h1>📊 Full Stack Application</h1>
+        <p class="subtitle">Deployed with Jenkins + Docker + MongoDB</p>
+        
+        <div class="status-bar">
+            <div class="status-item">
+                <span class="status-label">Backend:</span>
+                <span id="backendStatus" class="status-value success">Connected</span>
+            </div>
+            <div class="status-item">
+                <span class="status-label">Database:</span>
+                <span id="dbStatus" class="status-value success">Connected</span>
+            </div>
+        </div>
+
+        <div class="tabs">
+            <button class="tab-btn active" onclick="showTab('users')">👥 Users</button>
+            <button class="tab-btn" onclick="showTab('products')">📦 Products</button>
+        </div>
+
+        <!-- Users Tab -->
+        <div id="usersTab" class="tab-content active">
+            <div class="section">
+                <h2>Add New User</h2>
+                <form id="userForm" class="form">
+                    <input type="text" id="userName" placeholder="Name" required>
+                    <input type="email" id="userEmail" placeholder="Email" required>
+                    <input type="number" id="userAge" placeholder="Age">
+                    <input type="text" id="userCity" placeholder="City">
+                    <button type="submit" class="btn-primary">Add User</button>
+                </form>
+            </div>
+
+            <div class="section">
+                <h2>Users List</h2>
+                <div id="usersList" class="data-list">
+                    <!-- Users will be loaded here -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Products Tab -->
+        <div id="productsTab" class="tab-content">
+            <div class="section">
+                <h2>Add New Product</h2>
+                <form id="productForm" class="form">
+                    <input type="text" id="productName" placeholder="Product Name" required>
+                    <input type="number" id="productPrice" placeholder="Price" step="0.01" required>
+                    <input type="text" id="productCategory" placeholder="Category">
+                    <textarea id="productDescription" placeholder="Description"></textarea>
+                    <label class="checkbox-label">
+                        <input type="checkbox" id="productInStock" checked> In Stock
+                    </label>
+                    <button type="submit" class="btn-primary">Add Product</button>
+                </form>
+            </div>
+
+            <div class="section">
+                <h2>Products List</h2>
+                <div id="productsList" class="data-list">
+                    <!-- Products will be loaded here -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
