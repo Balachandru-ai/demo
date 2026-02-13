@@ -2,43 +2,48 @@ pipeline {
     agent any
 
     environment {
-        DOCKER_IMAGE = "balachandru/backend"
-        DOCKER_TAG = "latest"
+        BACKEND_IMAGE = "backend-app"
+        FRONTEND_IMAGE = "frontend-app"
     }
 
     stages {
 
+        stage('Clone Code') {
+            steps {
+                git 'https://github.com/Balachandru-ai/demo.git'
+            }
+        }
+
         stage('Build Backend Image') {
             steps {
-                sh 'docker build -f Dockerfile.backend -t $DOCKER_IMAGE:$DOCKER_TAG .'
+                sh 'docker build -t $BACKEND_IMAGE -f Dockerfile.backend .'
             }
         }
 
-        stage('Login to DockerHub') {
+        stage('Build Frontend Image') {
             steps {
-                withCredentials([usernamePassword(
-                    credentialsId: 'dockerhub-creds',
-                    usernameVariable: 'DOCKER_USER',
-                    passwordVariable: 'DOCKER_PASS'
-                )]) {
-                    sh 'echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin'
-                }
+                sh 'docker build -t $FRONTEND_IMAGE -f Dockerfile.frontend .'
             }
         }
 
-        stage('Push Image') {
-            steps {
-                sh 'docker push $DOCKER_IMAGE:$DOCKER_TAG'
-            }
-        }
-
-        stage('Deploy Container') {
+        stage('Stop Old Containers') {
             steps {
                 sh '''
-                docker stop backend || true
-                docker rm backend || true
-                docker run -d -p 5000:5000 --name backend $DOCKER_IMAGE:$DOCKER_TAG
+                docker rm -f backend-container || true
+                docker rm -f frontend-container || true
                 '''
+            }
+        }
+
+        stage('Run Backend Container') {
+            steps {
+                sh 'docker run -d -p 5000:5000 --name backend-container $BACKEND_IMAGE'
+            }
+        }
+
+        stage('Run Frontend Container') {
+            steps {
+                sh 'docker run -d -p 80:80 --name frontend-container $FRONTEND_IMAGE'
             }
         }
     }
