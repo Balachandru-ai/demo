@@ -2,15 +2,15 @@ pipeline {
     agent any
 
     environment {
-        DOCKER_IMAGE = "balachandru/webpage"
+        DOCKER_IMAGE = "balachandru/backend"
         DOCKER_TAG = "latest"
     }
 
     stages {
 
-        stage('Build Docker Image') {
+        stage('Build Backend Image') {
             steps {
-                sh 'docker build -t $DOCKER_IMAGE:$DOCKER_TAG .'
+                sh 'docker build -f Dockerfile.backend -t $DOCKER_IMAGE:$DOCKER_TAG .'
             }
         }
 
@@ -35,9 +35,9 @@ pipeline {
         stage('Deploy Container') {
             steps {
                 sh '''
-                docker stop webpage || true
-                docker rm webpage || true
-                docker run -d -p 80:5000 --name webpage $DOCKER_IMAGE:$DOCKER_TAG
+                docker stop backend || true
+                docker rm backend || true
+                docker run -d -p 5000:5000 --name backend $DOCKER_IMAGE:$DOCKER_TAG
                 '''
             }
         }
