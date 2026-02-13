@@ -2,7 +2,7 @@ pipeline {
     agent any
 
     environment {
-        DOCKER_IMAGE = "balachandru/flask-app"
+        DOCKER_IMAGE = "balachandru/webpage"
         DOCKER_TAG = "latest"
     }
 
@@ -41,9 +41,9 @@ pipeline {
         stage('Deploy Container') {
             steps {
                 sh '''
-                docker stop flask-app || true
-                docker rm flask-app || true
-                docker run -d -p 80:5000 --name flask-app $DOCKER_IMAGE:$DOCKER_TAG
+                docker stop webpage || true
+                docker rm webpage || true
+                docker run -d -p 80:5000 --name webpage $DOCKER_IMAGE:$DOCKER_TAG
                 '''
             }
         }
