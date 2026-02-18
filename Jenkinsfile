@@ -8,6 +8,15 @@ pipeline {
 
     stages {
 
+        stage('Cleanup Old Containers') {
+            steps {
+                sh '''
+                    docker rm -f backend-container frontend-container || true
+                 '''
+            }
+        }
+
+
         stage('Build Backend Image') {
             steps {
                 sh 'docker build -t $BACKEND_IMAGE -f Dockerfile.backend .'
