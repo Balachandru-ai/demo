@@ -1,7 +1,7 @@
 // ====================== CONFIG ======================
 const API_URL = window.location.hostname === 'localhost'
     ? 'http://localhost:5000/api'
-    : 'http://backend:5000/api';  // Use Docker service name inside containers
+    : 'http://${window.location.hostname}:5000/api';  // Use Docker service name inside containers
 
 // ====================== INIT ======================
 document.addEventListener('DOMContentLoaded', () => {
