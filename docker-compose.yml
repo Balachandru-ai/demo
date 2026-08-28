@@ -1,4 +1,3 @@
-```yaml
 services:
   mongodb:
     image: mongo:6.0
@@ -118,4 +117,4 @@ networks:
   app-network:
     driver: bridge
     name: app-network
-```
+
