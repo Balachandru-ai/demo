@@ -1,120 +1,38 @@
-services:
-  mongodb:
-    image: mongo:6.0
-    container_name: mongodb
-    restart: unless-stopped
+backend:
+  build:
+    context: .
+    dockerfile: Dockerfile.backend
 
-    ports:
-      - "27017:27017"
+  container_name: backend
+  restart: unless-stopped
 
-    environment:
-      MONGO_INITDB_DATABASE: fullstack-app
-      MONGO_INITDB_ROOT_USERNAME: ${MONGO_USER:-admin}
-      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_PASSWORD:-admin123}
+  ports:
+    - "5000:5000"
 
-    volumes:
-      - mongodb_data:/data/db
-      - mongodb_config:/data/configdb
+  environment:
+    NODE_ENV: production
+    PORT: 5000
+    MONGO_URI: mongodb://${MONGO_USER:-admin}:${MONGO_PASSWORD:-admin123}@mongodb:27017/fullstack-app?authSource=admin
 
-    networks:
-      - app-network
+  depends_on:
+    mongodb:
+      condition: service_healthy
 
-    healthcheck:
-      test:
-        [
-          "CMD-SHELL",
-          "mongosh --quiet --eval \"db.adminCommand('ping').ok\""
-        ]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-      start_period: 20s
+  networks:
+    - app-network
 
+  volumes:
+    - backend_logs:/app/logs
 
-  backend:
-    build:
-      context: .
-      dockerfile: Dockerfile.backend
-
-    container_name: backend
-    restart: unless-stopped
-
-    ports:
-      - "5000:5000"
-
-    environment:
-      NODE_ENV: production
-      PORT: 5000
-      MONGO_URI: mongodb://${MONGO_USER:-admin}:${MONGO_PASSWORD:-admin123}@mongodb:27017/fullstack-app?authSource=admin
-
-    depends_on:
-      mongodb:
-        condition: service_healthy
-
-    networks:
-      - app-network
-
-    volumes:
-      - backend_logs:/app/logs
-
-    healthcheck:
-      test:
-        [
-          "CMD-SHELL",
-          "curl -f http://localhost:5000/health || exit 1"
-        ]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-      start_period: 40s
-
-
-  frontend:
-    build:
-      context: .
-      dockerfile: Dockerfile.frontend
-
-    container_name: frontend
-    restart: unless-stopped
-
-    ports:
-      - "80:80"
-
-    depends_on:
-      backend:
-        condition: service_healthy
-
-    networks:
-      - app-network
-
-    healthcheck:
-      test:
-        [
-          "CMD-SHELL",
-          "wget --quiet --tries=1 --spider http://localhost/ || exit 1"
-        ]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-      start_period: 40s
-
-
-volumes:
-  mongodb_data:
-    driver: local
-    name: mongodb_data
-
-  mongodb_config:
-    driver: local
-    name: mongodb_config
-
-  backend_logs:
-    driver: local
-    name: backend_logs
-
-
-networks:
-  app-network:
-    driver: bridge
-    name: app-network
-
+  healthcheck:
+    test:
+      [
+        "CMD",
+        "node",
+        "-e",
+        "require('http').get('http://127.0.0.1:5000/health',r=>process.exit(r.statusCode===200?0:1)).on('error',()=>process.exit(1))"
+      ]
+    interval: 10s
+    timeout: 5s
+    retries: 5
+    start_period: 20s
